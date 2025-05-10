@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Diagnóstico de Reparos de Controle</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url('https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/media/image/2018/10/logo-playstation.jpg?tf=3840x');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      color: #FFFFFF;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 20px;
+      text-align: center;
+      border-bottom: 3px solid #388E3C;
+    }
+    h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .form-container {
+      background-color: rgba(51, 51, 51, 0.7);
+      width: 90%; max-width: 400px;
+      margin: 20px auto;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    }
+    .form-container label,
+    .form-container select,
+    .form-container button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      color: #FFFFFF;
+    }
+    .form-container select {
+      padding: 10px;
+      border: 1px solid #666;
+      border-radius: 5px;
+      background-color: #444;
+      font-size: 14px;
+    }
+    .form-container button {
+      padding: 12px;
+      background-color: #000;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .form-container button:hover {
+      background-color: #333;
+    }
+    .erro-msg {
+      color: #FF6B6B;
+      text-align: center;
+      font-weight: bold;
+      margin-top: -5px;
+    }
+    .resultado-container {
+      width: 90%; max-width: 400px;
+      margin: 20px auto;
+    }
+    .resultado {
+      background-color: rgba(51, 51, 51, 0.8);
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+      color: #DCDCDC;
+    }
+    .resultado h2 {
+      margin-top: 0;
+      color: #4CAF50;
+    }
+    .diagnostico {
+      background-color: #444;
+      border: 1px solid #666;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    .diagnostico + .diagnostico {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Calculadora de Diagnóstico de Reparos de Controle</h1>
+  </header>
+
+  <div class="form-container">
+    <form id="diagnostico-form">
+      <label for="modelo">1. Selecione o modelo do controle</label>
+      <select id="modelo" required>
+        <option value="">Selecione</option>
+        <option value="ps4">PlayStation 4</option>
+        <option value="ps5">PlayStation 5</option>
+      </select>
+
+      <label for="liga">2. O controle está ligando?</label>
+      <select id="liga" required>
+        <option value="">Selecione</option>
+        <option value="sim">Sim</option>
+        <option value="nao">Não</option>
+      </select>
+
+      <label for="botoes">3. Os botões estão funcionando corretamente?</label>
+      <select id="botoes" required>
+        <option value="">Selecione</option>
+        <option value="sim">Sim</option>
+        <option value="nao">Não</option>
+      </select>
+
+      <label for="bateria">4. O controle funciona na bateria?</label>
+      <select id="bateria" required>
+        <option value="">Selecione</option>
+        <option value="sim">Sim</option>
+        <option value="nao">Não</option>
+      </select>
+
+      <label for="carrega">5. O controle carrega normalmente?</label>
+      <select id="carrega" required>
+        <option value="">Selecione</option>
+        <option value="sim">Sim</option>
+        <option value="nao">Não</option>
+      </select>
+
+      <label for="analogicos">6. Os analógicos estão funcionando?</label>
+      <select id="analogicos" required>
+        <option value="">Selecione</option>
+        <option value="sim">Sim</option>
+        <option value="nao">Não</option>
+      </select>
+
+      <label for="bluetooth">7. O controle conecta via Bluetooth?</label>
+      <select id="bluetooth" required>
+        <option value="">Selecione</option>
+        <option value="sim">Sim</option>
+        <option value="nao">Não</option>
+      </select>
+
+      <button type="button" id="calcular-btn" onclick="calcularDiagnostico()" disabled>Calcular Diagnóstico</button>
+      <p class="erro-msg" id="erro-msg"></p>
+    </form>
+  </div>
+
+  <div class="resultado-container" id="diagnostico-container"></div>
+
+  <script>
+    const form = document.getElementById('diagnostico-form');
+    const btnCalcular = document.getElementById('calcular-btn');
+    const erroMsg = document.getElementById('erro-msg');
+
+    form.addEventListener('change', () => {
+      const todosPreenchidos = Array.from(form.querySelectorAll('select[required]')).every(s => s.value);
+      btnCalcular.disabled = !todosPreenchidos;
+      erroMsg.textContent = todosPreenchidos ? '' : 'Por favor, preencha todos os campos.';
+    });
+
+    function calcularDiagnostico() {
+      const modelo = form.modelo.value;
+      const liga = form.liga.value;
+      const botoes = form.botoes.value;
+      const bateria = form.bateria.value;
+      const carrega = form.carrega.value;
+      const analogicos = form.analogicos.value;
+      const bluetooth = form.bluetooth.value;
+
+      const diagnosticos = [];
+      const valoresReparo = [];
+      const explicacoes = [];
+
+      if (liga === 'nao' && carrega === 'nao') {
+        diagnosticos.push('Controle sem sinal de carregamento nem ligação.');
+        valoresReparo.push(250);
+        explicacoes.push('Defeito pode estar na placa ou bateria; análise detalhada é necessária.');
+      } else {
+        if (carrega === 'nao') {
+          diagnosticos.push('Troca do dock de carga');
+          valoresReparo.push(150);
+          explicacoes.push('Dock de carga defeituoso impede o carregamento.');
+        }
+        if (botoes === 'nao' && liga === 'sim') {
+          diagnosticos.push('Substituição da membrana condutiva');
+          valoresReparo.push(150);
+          explicacoes.push('Membrana dos botões apresenta mau contato.');
+        }
+        if (analogicos === 'nao') {
+          diagnosticos.push('Troca dos analógicos');
+          valoresReparo.push(120);
+          explicacoes.push('Drift nos analógicos; substituição necessária.');
+        }
+        if (bluetooth === 'nao') {
+          diagnosticos.push('Reparo na placa de Bluetooth');
+          valoresReparo.push(250);
+          explicacoes.push('Placa BT defeituosa impede conexão wireless.');
+        }
+        if (bateria === 'nao') {
+          diagnosticos.push('Troca da bateria');
+          valoresReparo.push(170);
+          explicacoes.push('Bateria interna não retém carga.');
+        }
+      }
+
+      for (let i = 1; i < valoresReparo.length; i++) {
+        valoresReparo[i] *= 0.7;
+      }
+
+      const itensHTML = diagnosticos.map((d, i) =>
+        `<div class="diagnostico">
+           <p><strong>Defeito ${i+1}:</strong> ${d}</p>
+           <p>${explicacoes[i]}</p>
+           <p><strong>Valor: R$${valoresReparo[i].toFixed(2)}</strong></p>
+         </div>`
+      ).join('');
+
+      const valorTotal = valoresReparo.reduce((sum, v) => sum + v, 0);
+      let parcelas = 0;
+      if (valorTotal >= 70) {
+        parcelas = Math.min(Math.floor(valorTotal / 70), 10);
+      }
+
+      document.getElementById('diagnostico-container').innerHTML =
+        `<div class="resultado">
+           <h2>Diagnóstico do Controle</h2>
+           ${itensHTML}
+           <p><strong>Total: R$${valorTotal.toFixed(2)}</strong></p>
+           <p>Parcelas: até ${parcelas}x de R$${(valorTotal/parcelas).toFixed(2)}</p>
+         </div>`;
+    }
+  </script>
+</body>
+</html>
